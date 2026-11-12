@@ -1,0 +1,114 @@
+# Golden rules — the "client legal playbook" for ClauseCheck.
+#
+# Perspective: "Client" is the party whose lawyers run the review (assume Client is the
+# customer / licensee receiving goods, services or IP). Rubrics are written from Client's side.
+#
+# cuad_category links each rule to CUAD's lawyer-labelled spans, used for retrieval evals
+# (does the system find the right clause?). Green/Yellow/Red labels are NOT in CUAD; we build
+# them in Phase 1 (synthetic rewrites + hand-checked sample).
+#
+# Chosen for: real legal weight, enough prevalence in CUAD (24-86% of contracts) to give both
+# "present" and naturally "missing" (Red) cases, and a mix of short and long clauses.
+
+rules:
+  - id: governing_law
+    title: Governing law is New York or Delaware
+    cuad_category: Governing Law          # present in 86% of CUAD contracts
+    doc_types: [all]
+    ideal_text: >
+      This Agreement shall be governed by and construed in accordance with the laws of the
+      State of New York, without giving effect to any choice or conflict of law provision or rule.
+    rubric:
+      green: Governed by New York or Delaware law.
+      yellow: Another US state's law, or split/ambiguous governing law, or governing law stated only for part of the agreement.
+      red: Non-US governing law, or no governing law clause.
+
+  - id: anti_assignment
+    title: Counterparty cannot assign without Client's consent
+    cuad_category: Anti-Assignment        # 73%
+    doc_types: [all]
+    ideal_text: >
+      Neither party may assign or transfer this Agreement without the prior written consent of
+      the other party, except that Client may assign this Agreement without consent to an
+      affiliate or to a successor in connection with a merger or sale of substantially all its assets.
+    rubric:
+      green: Counterparty needs Client's prior written consent to assign; Client keeps an affiliate/successor carve-out.
+      yellow: Mutual consent requirement without Client's carve-out, or consent "not to be unreasonably withheld" on Client's own assignments.
+      red: Counterparty may assign freely, or no assignment clause.
+
+  - id: cap_on_liability
+    title: Mutual liability cap with standard carve-outs
+    cuad_category: Cap On Liability       # 54%
+    doc_types: [services, license, supply, distributor, outsourcing]
+    ideal_text: >
+      Except for breaches of confidentiality, indemnification obligations, or a party's gross
+      negligence or willful misconduct, neither party's aggregate liability under this Agreement
+      shall exceed the fees paid or payable in the twelve (12) months preceding the claim.
+    rubric:
+      green: Mutual cap of at least 12 months' fees, with carve-outs for confidentiality, indemnity, and gross negligence/willful misconduct.
+      yellow: Cap present but one-sided in counterparty's favour, lower than 12 months' fees, or missing some carve-outs.
+      red: Client's liability is uncapped while counterparty's is capped, or counterparty's liability is capped at a nominal amount, or no cap clause where one is expected.
+
+  - id: audit_rights
+    title: Client may audit counterparty's records
+    cuad_category: Audit Rights           # 42%
+    doc_types: [services, license, distributor, outsourcing, supply]
+    ideal_text: >
+      Upon thirty (30) days' prior written notice, Client or its independent auditor may inspect
+      and audit Supplier's books and records relating to this Agreement, no more than once per
+      calendar year, during normal business hours.
+    rubric:
+      green: Client has a right to audit counterparty's relevant records on reasonable notice.
+      yellow: Audit right exists but is heavily restricted (only by counterparty-approved auditor, very long notice, cost always borne by Client regardless of findings).
+      red: Only the counterparty may audit Client, or no audit right.
+
+  - id: termination_for_convenience
+    title: Client may terminate for convenience
+    cuad_category: Termination For Convenience   # 36%
+    doc_types: [services, outsourcing, maintenance, hosting, consulting]
+    ideal_text: >
+      Client may terminate this Agreement, in whole or in part, for any reason or no reason upon
+      thirty (30) days' prior written notice to Supplier.
+    rubric:
+      green: Client can terminate without cause on notice of 90 days or less.
+      yellow: Client can terminate for convenience but only with long notice (>90 days) or a significant termination fee; or the right is mutual.
+      red: Only the counterparty can terminate for convenience, or no termination-for-convenience right for Client.
+
+  - id: insurance
+    title: Counterparty maintains adequate insurance
+    cuad_category: Insurance              # 33%
+    doc_types: [services, supply, manufacturing, transportation, outsourcing]
+    ideal_text: >
+      Supplier shall maintain, at its own expense, commercial general liability insurance with
+      limits of not less than $1,000,000 per occurrence and shall name Client as an additional
+      insured and provide certificates of insurance upon request.
+    rubric:
+      green: Counterparty must carry stated insurance with specified minimum limits, ideally naming Client as additional insured.
+      yellow: Insurance obligation without minimum limits, or "commercially reasonable" coverage only.
+      red: No insurance obligation on the counterparty.
+
+  - id: ip_ownership
+    title: Client owns deliverables and work product
+    cuad_category: Ip Ownership Assignment   # 24%
+    doc_types: [development, services, consulting, outsourcing]
+    ideal_text: >
+      All deliverables and work product created by Supplier under this Agreement shall be the sole
+      and exclusive property of Client, and Supplier hereby assigns to Client all right, title, and
+      interest therein, including all intellectual property rights.
+    rubric:
+      green: Present assignment ("hereby assigns") of deliverables/work-product IP to Client.
+      yellow: Client gets only a broad licence, or an agreement to assign in future, or ownership excludes significant pre-existing components without a licence back.
+      red: Counterparty retains ownership of deliverables, or no IP ownership clause in a development/services agreement.
+
+  - id: change_of_control
+    title: Client may terminate on counterparty change of control
+    cuad_category: Change Of Control      # 24%
+    doc_types: [license, distributor, strategic_alliance, outsourcing, collaboration]
+    ideal_text: >
+      Client may terminate this Agreement upon written notice if Supplier undergoes a change of
+      control, including any merger, acquisition, or transfer of more than fifty percent (50%) of
+      its voting securities, particularly to a competitor of Client.
+    rubric:
+      green: Client may terminate (or must consent) if the counterparty undergoes a change of control.
+      yellow: Only notice of a change of control is required, or the right applies only to acquisition by a named competitor.
+      red: A change of control of Client triggers counterparty rights against Client, or no change-of-control protection.

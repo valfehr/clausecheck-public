@@ -1,0 +1,174 @@
+{
+ "governing_law": {
+  "preferred": "Ask for the ideal clause: 'This Agreement shall be governed by and construed in accordance with the laws of the State of New York, without giving effect to any choice or conflict of law provision or rule.' It should cover the whole Agreement. New York is the first choice, and Delaware is equally acceptable. Replace any non-US or partial governing law with this wording and leave the rest of the clause and the agreement alone.",
+  "fallback": "Accept Delaware law in place of New York, with the same whole-agreement scope and the exclusion of conflict-of-law rules. If the counterparty resists the conflicts carve-out wording, accept a plain 'governed by the laws of the State of New York (or Delaware)' formulation, provided it applies to the entire Agreement. Do not accept any other US state, a split choice of law, or a non-US law without escalating.",
+  "never_do": [
+   "Do not add unrelated client-friendly terms such as venue, jury waiver, arbitration or fee-shifting while fixing governing law.",
+   "Do not delete or alter existing protections, assignment mechanics, amendment language or other unrelated sentences in the clause.",
+   "Do not change defined terms, party names or section numbering and headings.",
+   "Do not leave governing law limited to certain sections or subject to later agreement by the parties.",
+   "Do not propose a non-US law or a US state other than New York or Delaware.",
+   "Do not rewrite the whole clause when a swap of the jurisdiction or deletion of a limiting proviso is enough."
+  ],
+  "examples": [
+   {
+    "situation": "Red: the Agreement is governed by English law, and the same clause also contains assignment and amendment terms unrelated to governing law.",
+    "original": "11. Choice of Law  This Agreement will be construed in accordance with the laws of England and Wales and is assignable by the Provider without consent, but may be assigned by Client only upon the written consent by all the parties hereto . Amendments will be made only upon written consent by both parties.",
+    "redline": "11. Choice of Law  This Agreement will be governed by and construed in accordance with the laws of the State of New York, without giving effect to any choice or conflict of law provision or rule, and is assignable by the Provider without consent, but may be assigned by Client only upon the written consent by all the parties hereto . Amendments will be made only upon written consent by both parties.",
+    "why_minimal": "Only the governing law is changed, from England and Wales to New York, with the conflicts exclusion added. The assignment and amendment language is untouched, even though the assignment term favors the Provider, because it is outside this rule."
+   },
+   {
+    "situation": "Yellow: New York law is chosen, but a proviso limits it to Sections 4 through 7 and leaves the rest to future agreement.",
+    "original": "27. Governing Law.  This Agreement shall be interpreted and enforced according to the laws of the State of New York without regard to principles of conflict of laws; provided, however, that this governing law provision shall apply only to Sections 4 through 7 of this Agreement, and the remaining provisions of this Agreement shall be interpreted and enforced in accordance with such laws as the Parties may agree in writing from time to time.",
+    "redline": "27. Governing Law.  This Agreement shall be interpreted and enforced according to the laws of the State of New York without regard to principles of conflict of laws.",
+    "why_minimal": "Deleting the proviso removes the partial scope and the open-ended 'as agreed' law, so New York law governs the whole Agreement. The existing New York choice and conflicts exclusion are kept as written."
+   }
+  ]
+ },
+ "anti_assignment": {
+  "preferred": "Open with the ideal position: neither party may assign or transfer the Agreement without the other's prior written consent, but Client may assign without consent to an affiliate or to a successor in a merger or sale of substantially all of its assets. Where the draft is already mutual, make the smallest edit: strike the 'not unreasonably withheld, conditioned or delayed' qualifier so Counterparty's assignment is subject to Client's unqualified consent, and add a Client-only carve-out for affiliates and successors. Keep the draft's own terms, structure and numbering.",
+  "fallback": "Accept a mutual consent requirement with the reasonableness qualifier applying only to consent Client gives (or only to Counterparty requests), provided Client keeps its carve-out for affiliates and for successors by merger or sale of substantially all assets. If pushed on the affiliate piece, accept notice to Counterparty after the assignment, and accept that the assignee must assume the obligations in writing. Do not give up the successor carve-out. Do not accept a reciprocal carve-out for Counterparty without a change-of-control or competitor protection.",
+  "never_do": [
+   "Do not change defined terms such as 'Party' or 'Agreement', or rename the parties.",
+   "Do not touch unrelated clauses such as 9.4 Governing Law.",
+   "Do not delete the existing prohibition on delegation of duties; it already protects Client.",
+   "Do not add unrelated client-friendly terms such as termination on assignment, change-of-control triggers or audit rights.",
+   "Do not leave the 'not unreasonably withheld' qualifier on consent to Counterparty's assignments.",
+   "Do not make the Client carve-out subject to Counterparty's consent or to a reasonableness standard.",
+   "Do not rewrite the whole clause when a few targeted edits reach the standard."
+  ],
+  "examples": [
+   {
+    "situation": "Clause 9.5 is mutual, requires consent that cannot be unreasonably withheld, conditioned or delayed, and has no Client affiliate or successor carve-out (yellow). Clause 9.4 is unrelated.",
+    "original": "9.4 Governing Law. This Agreement shall be governed by the laws of the State of Iowa. 9.5 Assignment.  No Party may assign any rights under this Agreement or delegate any duties hereunder without the prior written consent of the other Party, which consent shall not be unreasonably withheld, conditioned or delayed.",
+    "redline": "9.4 Governing Law. This Agreement shall be governed by the laws of the State of Iowa. 9.5 Assignment.  No Party may assign any rights under this Agreement or delegate any duties hereunder without the prior written consent of the other Party, ~~which consent shall not be unreasonably withheld, conditioned or delayed~~; provided, however, that Client may assign this Agreement without consent to an affiliate or to a successor in connection with a merger or sale of substantially all of its assets.",
+    "why_minimal": "Only 9.5 changes. The reasonableness qualifier is struck so Counterparty needs Client's unqualified prior written consent, and one proviso adds Client's affiliate/successor carve-out. The mutual structure, the 'Party' defined term, the delegation restriction and the Iowa governing law clause in 9.4 are unchanged."
+   }
+  ]
+ },
+ "cap_on_liability": {
+  "preferred": "Make the cap mutual and set it at no less than fees paid or payable in the prior 12 months, using the ideal clause: 'Except for breaches of confidentiality, indemnification obligations, or a party's gross negligence or willful misconduct, neither party's aggregate liability under this Agreement shall exceed the fees paid or payable in the twelve (12) months preceding the claim.' Delete any language that leaves the counterparty's liability uncapped. Keep the existing waiver and defined terms and change only the cap language.",
+  "fallback": "Accept a mutual cap at 12 months' fees where the carve-outs are limited to confidentiality, indemnification obligations, and gross negligence or willful misconduct. Alternatively, accept a cap tied to the greater of fees paid or payable in the prior 12 months and a fixed dollar floor. Accept a separate, higher super-cap for data or confidentiality breaches if the carve-outs for indemnity and gross negligence or willful misconduct remain. Do not go below 12 months' fees. Do not accept a one-sided cap.",
+  "never_do": [
+   "Do not leave the cap one-sided or keep wording that expressly gives the counterparty unlimited liability.",
+   "Do not delete the existing waiver of claims for property damage or its gross negligence/willful misconduct exception, since Client already gave these and they are unrelated to the cap.",
+   "Do not rename defined terms such as Sponsor, Indemnitees, Claims or Forty Niners SC, and do not rewrite the clause in the template's wording.",
+   "Do not add unrelated client-friendly terms such as new indemnities, insurance changes, or consequential damages waivers.",
+   "Do not lower the 12-month fee lookback or drop any of the three carve-outs.",
+   "Do not cap Client's indemnification, confidentiality or gross negligence/willful misconduct exposure by leaving those carve-outs out of the mutual cap."
+  ],
+  "examples": [
+   {
+    "situation": "Yellow: the cap applies only to Sponsor (Client) and states there is no corresponding limit on the Indemnitees' liability. The 12-month fee measure is acceptable but the cap is one-sided and has no carve-outs.",
+    "original": "(b) Sponsor's aggregate liability to the Indemnitees under this Agreement shall not exceed the fees paid or payable by Sponsor in the twelve (12) months preceding the claim, with no corresponding limit on the Indemnitees' liability to Sponsor;",
+    "redline": "(b) except for breaches of confidentiality, indemnification obligations, or a party's gross negligence or willful misconduct, neither Sponsor's aggregate liability to the Indemnitees nor the Indemnitees' aggregate liability to Sponsor under this Agreement shall exceed the fees paid or payable by Sponsor in the twelve (12) months preceding the claim;",
+    "why_minimal": "Keeps the existing 12-month fee cap, the party names and the defined term Indemnitees. It deletes only the 'no corresponding limit' language and adds the mutuality and the three carve-outs. The waiver in (a) and its gross negligence/willful misconduct exception are left untouched."
+   }
+  ]
+ },
+ "audit_rights": {
+  "preferred": "Client or its independent auditor may, on thirty (30) days' prior written notice, inspect, copy and audit the counterparty's books and records relating to the agreement, up to once per calendar year during normal business hours. Counterparty must keep such records for the term plus a reasonable tail (about two years). Auditor is not subject to counterparty approval, though a confidentiality undertaking is acceptable. If an audit shows an underpayment above a modest threshold (typically 5%), the counterparty reimburses reasonable audit costs and promptly pays the shortfall.",
+  "fallback": "Accept a counterparty right to reasonably object to a named auditor only for a genuine conflict of interest (e.g. a direct competitor) or require a customary confidentiality agreement; accept notice up to thirty (30) days; accept once-per-year limit and normal business hours; accept Client bearing audit costs where the audit shows no material discrepancy (underpayment under 5%), provided the counterparty bears costs and pays the shortfall with interest if the threshold is exceeded. Do not accept counterparty approval of auditor in its sole discretion.",
+  "never_do": [
+   "Do not add unrelated client-friendly terms (e.g. new termination rights, interest rates beyond the cost-shift, expanded reporting duties, or audit of non-relevant records).",
+   "Do not delete existing protections Client already has, such as the record-keeping obligation, the two-year tail, the 30-day notice, the once-per-year cap, or the right to copy.",
+   "Do not change defined terms or party names (keep 'EFS', 'Client', 'Agreement', 'Term').",
+   "Do not shorten notice or remove the annual cap, as that turns a market-standard redline into an aggressive ask.",
+   "Do not rewrite the whole clause; make surgical edits only to the auditor-approval and cost-allocation language.",
+   "Do not delete the cost-shift entirely without replacing it; a findings-based allocation is the realistic market position."
+  ],
+  "examples": [
+   {
+    "situation": "Audit right exists but is yellow: auditors must be approved by EFS and Client bears all audit costs regardless of findings.",
+    "original": "Verification of Information; Audit Right Generally.  During the Term of this Agreement and for two (2) years thereafter, (a) EFS shall maintain complete and accurate books and records relating to revenue generated under this Agreement; and (b) upon thirty (30) days' prior written notice, Client and/or its authorized representative(s) approved by EFS shall have the right to examine, review, copy and audit EFS' books and records relating to revenue generated under this Agreement, no more than once per calendar year, to verify the accuracy of the payments and associated information provided by EFS and to verify EFS' compliance with the terms and conditions of this Agreement, with all audit costs borne by Client regardless of the audit findings.",
+    "redline": "Verification of Information; Audit Right Generally.  During the Term of this Agreement and for two (2) years thereafter, (a) EFS shall maintain complete and accurate books and records relating to revenue generated under this Agreement; and (b) upon thirty (30) days' prior written notice, Client and/or its authorized representative(s) ~~approved by EFS~~ shall have the right to examine, review, copy and audit EFS' books and records relating to revenue generated under this Agreement, no more than once per calendar year, to verify the accuracy of the payments and associated information provided by EFS and to verify EFS' compliance with the terms and conditions of this Agreement, with all audit costs borne by Client ~~regardless of the audit findings~~ unless the audit reveals an underpayment of five percent (5%) or more, in which case EFS shall bear the reasonable costs of the audit.",
+    "why_minimal": "Only the two yellow-triggering restrictions are touched: the EFS approval of the auditor is struck and the always-Client cost rule becomes findings-based. The record-keeping duty, tail, 30-day notice, annual cap, scope and all defined terms stay as drafted."
+   }
+  ]
+ },
+ "termination_for_convenience": {
+  "preferred": "Client may terminate the Agreement, in whole or in part, for any reason or no reason on thirty (30) days' prior written notice to Supplier, with no termination fee. Payment is limited to Fees accrued for services performed through the effective date of termination.",
+  "fallback": "Accept up to ninety (90) days' prior written notice. Accept a modest, fixed, and clearly stated wind-down payment, limited to documented non-cancellable third-party costs or no more than one month of Fees. Accept a termination right that is mutual only if Client's notice period stays at or under 90 days and Client pays no significant fee. Resist any fee equal to several months of Fees, because that moves the clause to yellow.",
+  "never_do": [
+   "Do not delete or weaken the existing termination-for-cause triggers (insolvency, dissolution, assignment for creditors) that already protect Client.",
+   "Do not add unrelated client-friendly terms such as refunds, liability caps, or IP changes while fixing the termination right.",
+   "Do not change defined terms or party names (Diplomat, Tadeo, Fees, Agreement) or restructure the numbering of the list.",
+   "Do not make the convenience right conditional on Supplier's consent or on any cure period.",
+   "Do not lengthen the notice period or leave a termination fee in place, and do not make the right mutual in order to trade for a shorter notice period.",
+   "Do not let the fee survive in another form, for example by keeping 'in addition to all Fees accrued' language that implies a fee is due."
+  ],
+  "examples": [
+   {
+    "situation": "Clause (vi) allows Diplomat to terminate for convenience but requires 60 days' notice plus a non-refundable fee equal to six months of Fees, which is a significant fee that makes it yellow. The minimal fix is to remove the fee and keep the notice, which is already within 90 days.",
+    "original": "(vi)  Upon Diplomat giving Tadeo at least sixty (60) days advance written notice of termination of this Agreement, provided that Diplomat pays Tadeo, on or before the effective date of termination, a termination fee equal to six (6) months of the Fees payable under this Agreement at the rate in effect immediately prior to the notice date, which fee shall be non-refundable and shall be in addition to all Fees accrued through the effective date of termination.",
+    "redline": "(vi)  Upon Diplomat giving Tadeo at least thirty (30) days advance written notice of termination of this Agreement, provided that Diplomat pays Tadeo all Fees accrued through the effective date of termination.",
+    "why_minimal": "Only the notice period and the fee mechanics change. The fee is deleted, leaving payment of accrued Fees only. The notice is shortened to 30 days to match the ideal, though 60 days would also be green. The insolvency and dissolution triggers in (iii)-(v), the defined terms, and the clause numbering are untouched."
+   }
+  ]
+ },
+ "insurance": {
+  "preferred": "Counterparty must maintain, at its own expense throughout the term, commercial general liability insurance with stated minimum limits (market ask: $1,000,000 per occurrence and $2,000,000 annual aggregate), with a carrier of good standing, naming Client as additional insured, plus statutory workers' compensation where applicable. It must provide certificates of insurance on request and before activities begin, and give notice of cancellation or material reduction. Insurance must not limit the Counterparty's liability or indemnities.",
+  "fallback": "Accept a stated per-occurrence minimum (e.g. $1,000,000) without an aggregate, or a minimum that is reasonable for the activity. Accept additional-insured status 'where commercially available' or via blanket endorsement. Accept certificates on request only, and notice of cancellation limited to the insurer or broker's standard practice. Do not accept an insurance obligation with no numerical minimum, or one where the Counterparty sets its own limit.",
+  "never_do": [
+   "Do not add unrelated client-friendly terms (e.g. new indemnities, waivers of subrogation, higher-tier ratings, or extra coverage lines) beyond what the rule requires.",
+   "Do not delete protections Client already has, such as additional-insured status, carrier rating requirements, or existing certificate and cancellation-notice provisions.",
+   "Do not change defined terms, party names, or the clause's numbering and structure.",
+   "Do not leave the Counterparty's obligation open-ended by keeping 'reasonable', 'elect', or 'as determined by' language where a fixed minimum is required.",
+   "Do not impose insurance duties on Client that the original clause does not already contain, and do not rewrite the clause wholesale when targeted insertions or deletions will do."
+  ],
+  "examples": [
+   {
+    "situation": "Red clause: the obligation to carry insurance sits on ANTHEMIC (the Client) and the Sponsor (counterparty) has none; it also states the Sponsor has no insurance obligation and then oddly has the Sponsor provide certificates and have its insurance cancelled only on notice to ANTHEMIC. The minimal fix is to flip the obligation onto the Sponsor and keep the rest, without removing ANTHEMIC's existing coverage.",
+    "original": "The Sponsor has no obligation to procure or maintain any insurance under this Agreement.  The Sponsor will provide ANTHEMIC with properly executed certificates of insurance before the Sponsor provides any products or services at the Event, and the insurance will contain a provision that it cannot be reduced or cancelled unless and until the insurance company notifies ANTHEMIC.",
+    "redline": "The Sponsor will, at its sole cost and expense, obtain and maintain commercial general liability insurance with limits of no less than $1,000,000.00 per occurrence and $2,000,000.00 as an annual aggregate, naming ANTHEMIC as additional insured. The Sponsor will provide ANTHEMIC with properly executed certificates of insurance before the Sponsor provides any products or services at the Event, and the insurance will contain a provision that it cannot be reduced or cancelled unless and until the insurance company notifies ANTHEMIC.",
+    "why_minimal": "Only the first sentence is replaced, converting 'no obligation' into a stated-limit insurance obligation with additional-insured status. The certificate and cancellation-notice sentence, the defined terms, and ANTHEMIC's own insurance paragraph are untouched."
+   },
+   {
+    "situation": "Yellow clause: Company must carry CGL naming Client as additional insured, but limits are self-determined and the clause says there is no minimum. The minimal fix is to substitute a fixed minimum for the 'reasonable' and 'elect' language.",
+    "original": "in such amounts as Company reasonably determines to be commercially reasonable for the activities contemplated under this Agreement, and Company shall have no obligation to maintain any minimum limit of liability except as Company may elect.",
+    "redline": "with limits of not less than $1,000,000 per occurrence and $2,000,000 in the annual aggregate.",
+    "why_minimal": "Only the self-determined amount language and the 'no minimum' disclaimer are replaced with specific limits. The timing, expense, A+ carrier rating, additional-insured requirement, and all defined terms stay as drafted."
+   }
+  ]
+ },
+ "ip_ownership": {
+  "preferred": "Include a present-tense assignment: all deliverables and work product created by Supplier under the Agreement are the sole and exclusive property of Client, and Supplier hereby assigns to Client all right, title and interest in them, including all IP rights. Add a short further-assurances covenant only if the clause lacks one. Keep the existing structure and defined terms, and change only the ownership allocation.",
+  "fallback": "Accept a present assignment of deliverables and work product that carves out Supplier's genuinely pre-existing materials and general know-how, provided Client receives a perpetual, irrevocable, worldwide, royalty-free licence to use those materials as embedded in or necessary to use the deliverables. Do not accept an agreement to assign in future, a licence-only grant, or Supplier retaining ownership of the deliverables.",
+  "never_do": [
+   "Do not add unrelated client-friendly terms such as indemnities, warranties, moral rights waivers, or confidentiality changes beyond what the ownership rule needs.",
+   "Do not delete protections Client already has, e.g. the trademark non-filing covenant or the assignment of pre-existing trademark applications.",
+   "Do not change defined terms or party names (e.g. Company, Licensor, Duval Identification, Contract Period, Contract Territory), and do not swap in the playbook's Supplier/Client labels in the clause text.",
+   "Do not use 'agrees to assign' or 'will assign' language; use 'hereby assigns'.",
+   "Do not rewrite the whole clause when only the final ownership wording is wrong.",
+   "Do not leave Counterparty owning the deliverables while adding only a licence to Client."
+  ],
+  "examples": [
+   {
+    "situation": "Client is Company. The clause says deliverables and work product created by Company remain the exclusive property of Licensor with Company acquiring no rights. That is the reverse of the golden rule, so the ownership allocation must be flipped and the trademark covenants left alone.",
+    "original": "13. TRADEMARKS. Company agrees that it will not file, during the Contract Period or thereafter, any application for trademark registration or otherwise obtain or attempt to obtain ownership of any trademark or trade name within the Contract Territory or in any other country of the world which consists of the Duval Identification or any mark, design or logo intended to make reference to Duval or to identify products endorsed by Duval.  In the event that, prior to commencement of the Contract Period, Company has filed one or more applications for registration of any such trademark, or otherwise has obtained any rights to such trademark, Company agrees to cause such applications and/or trademarks to be assigned and transferred to Licensor forthwith, and all deliverables and work product created by Company under this Agreement shall remain the sole and exclusive property of Licensor, with Company acquiring no right, title or interest therein.",
+    "redline": "13. TRADEMARKS. Company agrees that it will not file, during the Contract Period or thereafter, any application for trademark registration or otherwise obtain or attempt to obtain ownership of any trademark or trade name within the Contract Territory or in any other country of the world which consists of the Duval Identification or any mark, design or logo intended to make reference to Duval or to identify products endorsed by Duval.  In the event that, prior to commencement of the Contract Period, Company has filed one or more applications for registration of any such trademark, or otherwise has obtained any rights to such trademark, Company agrees to cause such applications and/or trademarks to be assigned and transferred to Licensor forthwith. All deliverables and work product created by Company under this Agreement shall be the sole and exclusive property of Company, and Licensor hereby assigns to Company all right, title and interest therein, including all intellectual property rights.",
+    "why_minimal": "The trademark covenant and the assignment of pre-existing trademark filings to Licensor are untouched. Only the deliverables and work product ownership language is reversed, adding a present assignment ('hereby assigns') and moving ownership to the party that is Client. Defined terms and parties are unchanged."
+   }
+  ]
+ },
+ "change_of_control": {
+  "preferred": "Client may terminate the Agreement upon written notice if Supplier/Provider undergoes a Change of Control (any merger, acquisition, or transfer of more than 50% of voting securities), regardless of who the acquirer is, with express emphasis that acquisition by a competitor of Client is covered. Termination right is exercisable within a reasonable window (e.g., 90 days) after Client receives written notice of the Change of Control, and Provider must give prompt notice of any Change of Control.",
+  "fallback": "Keep the 90-day exercise window after notice of the Change of Control. Accept a Client termination right (or consent right) for any Change of Control where the acquirer is a competitor of Client, defined broadly (Named Competitors in Schedule A plus any other person reasonably determined by Client to compete with Client), with Schedule A amendable only by Client or by mutual agreement, not unilaterally by Provider. Never accept notice-only protection.",
+  "never_do": [
+   "Do not add unrelated Client-friendly terms (e.g., fee refunds, transition services, liability changes) beyond the change-of-control termination right.",
+   "Do not delete the existing 90-day notice-and-exercise mechanism or the existing Client termination right.",
+   "Do not change defined terms such as Change of Control, Provider, Client, Named Competitor or Schedule A, other than what is needed to remove the competitor limit and the unilateral Provider amendment power.",
+   "Do not touch the Auriemma/Berkshire assignment provisions in the first sentences of the clause.",
+   "Do not create any Provider rights triggered by a Change of Control of Client.",
+   "Do not rewrite the whole clause; make surgical deletions and insertions only."
+  ],
+  "examples": [
+   {
+    "situation": "Yellow clause limits Client's termination right on Provider's Change of Control to acquisition by a Named Competitor, with Provider able to unilaterally amend the Named Competitor list. Redline removes the competitor limit so any Change of Control triggers the right.",
+    "original": "Upon a Change of Control of Provider, Client may terminate this Agreement upon written notice to Provider given within ninety (90) days after Client receives written notice of such Change of Control; provided, however, that such termination right shall apply only if the acquiring person or entity is a Named Competitor, and Client shall have no right to terminate under this Section for any Change of Control in which the acquiring person or entity is not a Named Competitor.\n\"Named Competitor\" means the entities listed in Schedule A, as such Schedule may be amended by Provider from time to time upon notice to Client.",
+    "redline": "Upon a Change of Control of Provider, Client may terminate this Agreement upon written notice to Provider given within ninety (90) days after Client receives written notice of such Change of Control, including where the acquiring person or entity is a Named Competitor.\n\"Named Competitor\" means the entities listed in Schedule A, as such Schedule may be amended by Provider from time to time upon notice to Client.",
+    "why_minimal": "Only the proviso and the sentence limiting termination to Named Competitors are deleted, and a short insertion keeps competitor acquisitions expressly covered. The 90-day window, the defined terms, the Named Competitor definition and the unrelated assignment sentences are unchanged. Because the right now applies to any Change of Control, the Provider's ability to amend the schedule no longer limits Client's protection."
+   }
+  ]
+ }
+}

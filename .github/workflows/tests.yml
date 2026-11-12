@@ -1,0 +1,23 @@
+# $0 checks on every push and pull request: API, tracing and injection tests with the judge stubbed.
+# No API key, no model calls, no heavy ML install (the `ml` dependency group is skipped).
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - name: Install (core + dev only)
+        run: uv sync --locked --no-default-groups --group dev
+      - name: Tests
+        env:
+          PYTHONPATH: src
+        run: uv run --no-sync pytest -q tests

@@ -1,0 +1,44 @@
+# Paid eval, started by hand (Actions tab → "eval" → Run workflow). Real Claude calls on the test split, then the
+# release gates; the job fails if a gate fails. Needs the repository secret ANTHROPIC_API_KEY (set by the owner).
+# Budget: the in-code hard cap is set to (spend already in the committed ledger + max_usd), so one run can never
+# spend more than max_usd. Typical cost of the default suites: ~$0.15.
+name: eval
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_usd:
+        description: "Maximum API spend for this run (USD)"
+        default: "0.50"
+      suites:
+        description: "Eval suites (space-separated)"
+        default: "severity severity_hard"
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - name: Install (core + dev only)
+        run: uv sync --locked --no-default-groups --group dev
+      - name: Budget for this run
+        env:
+          PYTHONPATH: src
+        run: |
+          echo "CLAUSECHECK_BUDGET_USD=$(uv run --no-sync python -c "from clausecheck.llm import spent_usd; print(round(spent_usd() + float('${{ inputs.max_usd }}'), 4))")" >> "$GITHUB_ENV"
+      - name: Eval (test split, full contract, re-ask-3x)
+        env:
+          PYTHONPATH: src
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: uv run --no-sync python scripts/run_eval.py --name CI-eval --splits test --sc --suites ${{ inputs.suites }}
+      - name: Release gates
+        run: uv run --no-sync python scripts/check_gates.py CI-eval
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-run
+          path: runs/*CI-eval*

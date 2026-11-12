@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+data/raw/
+data/cache/
+tools/
+models/
+data/train/
+data/*.db
+data/dev_users.json
+data/inbox/
+data/traces/
+data/feedback_sim/
+data/feedback_sim.db
