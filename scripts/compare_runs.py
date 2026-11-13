@@ -14,9 +14,36 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "phase1_experiments.md"
 
 
+_LABELS: dict[str, tuple[str | None, str | None]] | None = None
+
+
+def current_labels() -> dict[str, tuple[str | None, str | None]]:
+    """case_id → (expected_status, expected_red_reason) from the eval files as they are NOW.
+
+    Run files store the label at run time; after an audited relabel (reviews/label_audit_decisions.jsonl) every
+    comparison must score old runs against the corrected label, or the reports silently keep the old error.
+    """
+    global _LABELS
+    if _LABELS is None:
+        _LABELS = {}
+        for p in (ROOT / "data" / "evals").glob("*.jsonl"):
+            if p.stem.endswith("_raw"):
+                continue
+            for l in p.read_text(encoding="utf-8").split("\n"):
+                if l.strip():
+                    r = json.loads(l)
+                    _LABELS[r["case_id"]] = (r.get("expected_status"), r.get("expected_red_reason"))
+    return _LABELS
+
+
 def latest(name: str) -> list[dict]:
     f = sorted((ROOT / "runs").glob(f"*_{name}.jsonl"))[-1]
-    return [json.loads(l) for l in f.read_text(encoding="utf-8").split("\n") if l.strip()]
+    rows = [json.loads(l) for l in f.read_text(encoding="utf-8").split("\n") if l.strip()]
+    labels = current_labels()
+    for r in rows:  # score against today's (audited) labels
+        if r.get("case_id") in labels and r.get("expected_status") is not None:
+            r["expected_status"], r["expected_red_reason"] = labels[r["case_id"]]
+    return rows
 
 
 def stats(rows: list[dict]) -> dict:

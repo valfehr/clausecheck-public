@@ -145,7 +145,7 @@ def _run(job_id: str, payload: dict | None, resume: dict | None) -> None:
             res["review"] = out.get("review")
             _set(job_id, status="completed", result=json.dumps(res))
     except Exception as e:  # noqa: BLE001 — the job records the failure; the API never crashes on a job
-        _set(job_id, status="failed", error=f"{type(e).__name__}: {str(e)[:300]}")
+        _set(job_id, status="failed", error=_user_message(e))
 
 
 def _submit(job_id: str, payload: dict | None = None, resume: dict | None = None) -> None:
@@ -203,7 +203,9 @@ def get_review(job_id: str, user: User = Depends(current_user)) -> dict:
                                                    for v in res.get("verdicts", [])],
                                      "needs_closer_look": res.get("needs_closer_look", []),
                                      "context": res.get("strategy"),
-                                     "served_from_storage": res.get("served_from_storage")} if res else {}),
+                                     "served_from_storage": res.get("served_from_storage"),
+                                     # the lawyer's decisions, once submitted: the UI shows these over the AI's verdicts
+                                     "decisions": (res.get("review") or {}).get("decisions", {})} if res else {}),
             "note": "First-pass verdicts; a lawyer validates each one."}
 
 
@@ -237,12 +239,34 @@ def decide(job_id: str, body: DecisionsIn, user: User = Depends(current_user)) -
 
 @app.get("/reviews/{job_id}/verdicts/{rule_id}")
 def explain(job_id: str, rule_id: str, user: User = Depends(current_user)) -> dict:
-    res = json.loads(_get_job(job_id, user)["result"] or "{}")
+    from clausecheck.segment import segment
+
+    j = _get_job(job_id, user)
+    res = json.loads(j["result"] or "{}")
     v = next((v for v in res.get("verdicts", []) if v["rule_id"] == rule_id), None)
     if not v:
         raise HTTPException(404, "no verdict for that rule yet")
-    return {k: v.get(k) for k in ("rule_id", "status", "red_reason", "rationale", "quote", "cited", "samples",
-                                  "needs_human", "why_flagged", "confidence")}
+    path, _ = _document(j["doc_id"], user)
+    by_id = {c.id: c.text for c in segment(j["doc_id"], open(path, encoding="utf-8").read())}
+    return {**{k: v.get(k) for k in ("rule_id", "status", "red_reason", "rationale", "quote", "cited", "samples",
+                                      "needs_human", "why_flagged", "confidence")},
+            "cited_text": {i: by_id.get(i, "") for i in v.get("cited", [])}}
+
+
+@app.get("/rules")
+def rules(user: User = Depends(current_user)) -> list[dict]:
+    return [{"id": r.id, "title": r.title, "green": r.rubric.green, "yellow": r.rubric.yellow, "red": r.rubric.red}
+            for r in load_rules()]
+
+
+@app.get("/reviews")
+def list_reviews(user: User = Depends(current_user)) -> list[dict]:
+    with _db() as con:
+        rows = con.execute("SELECT j.job_id, j.status, j.client, j.created, d.name, j.doc_id FROM jobs j "
+                           "JOIN documents d ON d.doc_id = j.doc_id AND d.tenant = j.tenant WHERE j.tenant=? "
+                           "ORDER BY j.created DESC LIMIT 50", (user.tenant,)).fetchall()
+    return [{"job_id": r[0], "status": r[1], "client": r[2], "created": r[3], "document": r[4], "document_id": r[5]}
+            for r in rows]
 
 
 # ---------------------------------------------------------------- suggest a fix (drafting agent, Phase 6 E6.3b)
@@ -311,7 +335,20 @@ def _run_fix(fix_id: str, job: dict, rule_id: str) -> None:
                 f"after {out.rounds} drafts the checker still found problems: reviewer rated it "
                 f"{last.get('judge')}; changes outside the rule: {last.get('outside_changes') or last.get('added_outside') or 'none'}")}))
     except Exception as e:  # noqa: BLE001
-        upd(status="failed", error=f"{type(e).__name__}: {str(e)[:300]}")
+        upd(status="failed", error=_user_message(e))
+
+
+def _user_message(e: Exception) -> str:
+    """What a lawyer sees when a job fails: plain words, no provider internals (those go to the server log)."""
+    import logging
+
+    logging.getLogger("clausecheck").warning("job failed: %s: %s", type(e).__name__, str(e)[:500])
+    text = str(e).lower()
+    if "credit balance" in text or type(e).__name__ == "BudgetExceeded":
+        return "The AI service's usage limit has been reached, so nothing new can be drafted right now. Try again later."
+    if "rate" in text and "limit" in text or "overloaded" in text:
+        return "The AI service is busy. Try again in a minute."
+    return "Something went wrong on our side; the error has been logged."
 
 
 @app.post("/reviews/{job_id}/verdicts/{rule_id}/suggest-fix", status_code=202)
@@ -389,3 +426,13 @@ def decide_fix(fix_id: str, body: FixDecision, user: User = Depends(current_user
 @app.get("/health")
 def health() -> dict:
     return {"ok": True}
+
+
+@app.get("/", include_in_schema=False)
+def ui():
+    """The web UI: one static page calling this API (no build step). Same file goes to S3 + CloudFront on AWS."""
+    from pathlib import Path
+
+    from fastapi.responses import FileResponse
+
+    return FileResponse(Path(__file__).parent / "ui" / "index.html")

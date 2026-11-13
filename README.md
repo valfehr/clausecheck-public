@@ -12,7 +12,7 @@ an eval with pass marks fixed before the run. Not legal advice; first-pass verdi
 
 | Question | Measured answer |
 |---|---|
-| Release gate (holdout, contract types never used for tuning) | red recall 11/12, 0 critical misses (red rated green), 100% citations verified |
+| Release gate (holdout, contract types never used for tuning) | red recall 12/12, 0 critical misses (red rated green), 100% citations verified (after a blind label audit corrected one label; 11/12 before) |
 | Cost per contract, 8 rules, with prompt caching | ~$0.006 (−69% vs no caching), ~7 s |
 | Stability (same contract, 3 runs) | 7.6% of verdicts changed → re-asking uncertain verdicts 3x → 3.0%, disagreements flagged for a human |
 | Full contract vs RAG (hybrid BM25 + vectors, top-10) | same quality on test, holdout and 47k–114k-token contracts; RAG ~3x cheaper per call uncached, but with caching full contract is cheaper for short contracts → full contract whenever it fits the context window |

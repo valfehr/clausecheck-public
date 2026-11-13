@@ -36,7 +36,7 @@ def wait(c: httpx.Client, job: str, h: dict, until: set[str]) -> dict:
 
 def main() -> None:
     users = ROOT / "data" / "dev_users.json"
-    keys = json.loads(users.read_text()) if users.exists() else {}
+    keys = json.loads(users.read_text(encoding="utf-8-sig")) if users.exists() else {}
     if "dev-lawyer" not in keys:
         keys["dev-lawyer"] = secrets.token_urlsafe(24)
         users.write_text(json.dumps(keys))

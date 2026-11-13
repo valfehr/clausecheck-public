@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClauseCheck</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1c2330; --muted: #5f6b7a; --line: #dde2e8;
+  --accent: #2f5bd3; --accent-ink: #ffffff;
+  --green: #1f7a4d; --green-bg: #e3f4ea; --yellow: #8a6100; --yellow-bg: #fdf1d4;
+  --red: #b42318; --red-bg: #fde4e1; --flag: #7a3cc0; --flag-bg: #f1e8fb;
+  --del: #fde4e1; --ins: #e3f4ea;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12161d; --panel: #1a2029; --ink: #e6eaf0; --muted: #9aa5b4; --line: #2c3440;
+    --accent: #7c9cff; --accent-ink: #0d1117;
+    --green: #6fd3a0; --green-bg: #173326; --yellow: #f2c35b; --yellow-bg: #362b12;
+    --red: #ff8f84; --red-bg: #3a1a17; --flag: #c9a2ff; --flag-bg: #2a1d3d;
+    --del: #3a1a17; --ins: #173326;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--line); background: var(--panel); }
+header h1 { font-size: 18px; margin: 0; }
+header .who { margin-left: auto; color: var(--muted); font-size: 13px; }
+main { display: grid; grid-template-columns: 300px 1fr; gap: 16px; padding: 16px 20px; max-width: 1280px; margin: 0 auto; }
+@media (max-width: 860px) { main { grid-template-columns: 1fr; padding: 12px 16px; } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+h2 { font-size: 15px; margin: 0 0 10px; }
+label { display: block; font-size: 13px; color: var(--muted); margin: 8px 0 4px; }
+input, select, textarea { width: 100%; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; }
+textarea { resize: vertical; }
+button { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button:disabled { opacity: .5; cursor: default; }
+.list { list-style: none; margin: 0; padding: 0; }
+.list li { padding: 8px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; }
+.list li:hover, .list li.on { border-color: var(--line); background: var(--bg); }
+.list .doc { font-size: 13px; overflow-wrap: anywhere; }
+.list .meta { font-size: 12px; color: var(--muted); }
+.pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 99px; text-transform: uppercase; letter-spacing: .02em; }
+.green { color: var(--green); background: var(--green-bg); } .yellow { color: var(--yellow); background: var(--yellow-bg); }
+.red { color: var(--red); background: var(--red-bg); } .flag { color: var(--flag); background: var(--flag-bg); }
+.muted { color: var(--muted); }
+.banner { border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: var(--flag-bg); color: var(--flag); }
+.rules { display: grid; gap: 10px; margin-top: 10px; }
+.rule { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.rule.flagged { border-color: var(--flag); }
+.rule-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; cursor: pointer; }
+.rule-head .t { font-weight: 600; }
+.rule-body { margin-top: 10px; display: none; }
+.rule.open .rule-body { display: block; }
+.quote { border-left: 3px solid var(--accent); padding: 6px 10px; margin: 8px 0; background: var(--bg); white-space: pre-wrap; }
+.cited { font-size: 13px; color: var(--muted); white-space: pre-wrap; max-height: 220px; overflow: auto; border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
+.row > div { flex: 1 1 160px; }
+.actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.diff { white-space: pre-wrap; border: 1px solid var(--line); border-radius: 6px; padding: 8px; font-size: 14px; }
+.diff del { background: var(--del); text-decoration: line-through; } .diff ins { background: var(--ins); text-decoration: none; }
+.err { color: var(--red); font-size: 13px; }
+.small { font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ClauseCheck</h1>
+  <span class="muted small">first-pass contract review — every verdict is validated by a lawyer</span>
+  <span class="who" id="who"></span>
+</header>
+
+<main>
+  <aside>
+    <section class="panel" id="login">
+      <h2>Sign in</h2>
+      <label for="key">API key</label>
+      <input id="key" type="password" autocomplete="off">
+      <div class="actions"><button class="primary" id="signin">Sign in</button></div>
+      <div class="err" id="login-err"></div>
+    </section>
+
+    <section class="panel" id="new" hidden>
+      <h2>New review</h2>
+      <label for="file">Contract (.txt)</label>
+      <input id="file" type="file" accept=".txt,text/plain">
+      <label for="paste">…or paste the text</label>
+      <textarea id="paste" rows="4"></textarea>
+      <label for="client">We represent (Client)</label>
+      <input id="client" value="the customer / recipient of goods or services">
+      <div class="actions"><button class="primary" id="start">Review against all rules</button></div>
+      <div class="err" id="new-err"></div>
+    </section>
+
+    <section class="panel" id="history" hidden style="margin-top:16px">
+      <h2>Reviews</h2>
+      <ul class="list" id="reviews"></ul>
+    </section>
+  </aside>
+
+  <section class="panel" id="detail">
+    <p class="muted">Sign in, then start a review or open one from the list.</p>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let KEY = "", RULES = {}, CURRENT = null, POLL = null;
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+async function api(path, opts = {}) {
+  const r = await fetch(path, { ...opts, headers: { "X-API-Key": KEY, "Content-Type": "application/json", ...(opts.headers || {}) } });
+  const body = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(body.detail ? (typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail)) : r.statusText);
+  return body;
+}
+
+$("signin").onclick = async () => {
+  KEY = $("key").value.trim();
+  try {
+    const rs = await api("/rules");
+    RULES = Object.fromEntries(rs.map((r) => [r.id, r]));
+    try { sessionStorage.setItem("cc-key", KEY); } catch (e) {}
+    $("login").hidden = true; $("new").hidden = false; $("history").hidden = false;
+    $("who").textContent = "signed in";
+    loadReviews();
+  } catch (e) { $("login-err").textContent = "Sign-in failed: " + e.message; }
+};
+try { const k = sessionStorage.getItem("cc-key"); if (k) { $("key").value = k; $("signin").click(); } } catch (e) {}
+
+async function loadReviews() {
+  const rows = await api("/reviews");
+  $("reviews").innerHTML = rows.map((r) => `<li data-id="${r.job_id}" class="${CURRENT === r.job_id ? "on" : ""}">
+      <div class="doc">${esc(r.document)}</div>
+      <div class="meta">${esc(r.status.replace("_", " "))} · ${new Date(r.created * 1000).toLocaleString()}</div></li>`).join("")
+    || `<li class="muted small">No reviews yet.</li>`;
+  document.querySelectorAll("#reviews li[data-id]").forEach((li) => (li.onclick = () => openReview(li.dataset.id)));
+}
+
+$("start").onclick = async () => {
+  $("new-err").textContent = "";
+  const f = $("file").files[0];
+  const text = f ? await f.text() : $("paste").value;
+  if (text.trim().length < 200) { $("new-err").textContent = "The contract text is too short."; return; }
+  try {
+    $("start").disabled = true;
+    const doc = await api("/documents", { method: "POST", body: JSON.stringify({ name: f ? f.name : "pasted contract", text }) });
+    const job = await api("/reviews", { method: "POST", headers: { "Idempotency-Key": doc.document_id + "|" + $("client").value },
+      body: JSON.stringify({ document_id: doc.document_id, client: $("client").value }) });
+    await loadReviews(); openReview(job.job_id);
+  } catch (e) { $("new-err").textContent = e.message; }
+  finally { $("start").disabled = false; }
+};
+
+async function openReview(id) {
+  CURRENT = id; clearTimeout(POLL);
+  const r = await api(`/reviews/${id}`);
+  document.querySelectorAll("#reviews li").forEach((li) => li.classList.toggle("on", li.dataset.id === id));
+  if (["queued", "running", "resuming"].includes(r.status)) {
+    $("detail").innerHTML = `<h2>Reviewing…</h2><p class="muted">Status: ${esc(r.status)}. Each rule is checked against the contract with citations; this takes a few seconds.</p>`;
+    POLL = setTimeout(() => openReview(id), 1500); return;
+  }
+  if (r.status === "failed") { $("detail").innerHTML = `<h2>Review failed</h2><p class="err">${esc(r.error)}</p>`; loadReviews(); return; }
+  renderReview(r);
+  loadReviews();  // the list may have been fetched mid-run: refresh it once the review settles
+}
+
+function renderReview(r) {
+  const done = r.status === "completed";
+  const flagged = r.needs_closer_look || [];
+  $("detail").innerHTML = `
+    <h2>${done ? "Review completed" : "Review ready — validate each verdict"}</h2>
+    <div class="muted small">Client: ${esc(r.client)} · context: ${esc(r.context || "")}${r.served_from_storage ? " · served from storage (same contract, same answer)" : ""}</div>
+    ${flagged.length ? `<div class="banner"><strong>${flagged.length} verdict${flagged.length > 1 ? "s need" : " needs"} a closer look.</strong>
+       ${[...new Set(flagged.map((f) => f.why))].map(esc).join("; ")}</div>` : ""}
+    <div class="rules">${r.verdicts.map((v) => ruleCard(v, done, (r.decisions || {})[v.rule_id])).join("")}</div>
+    ${done ? `<p class="muted small">Decisions recorded. They feed the evaluation and feedback pipeline.</p>`
+           : `<div class="actions"><button class="primary" id="submit">Submit decisions</button><span class="err" id="submit-err"></span></div>`}`;
+  document.querySelectorAll(".rule-head").forEach((h) => (h.onclick = () => toggleRule(h.parentElement, r.job_id)));
+  document.querySelectorAll("select.action").forEach((s) => (s.onchange = () => {
+    s.closest(".rule").querySelector(".newstatus").hidden = s.value !== "change_severity";
+  }));
+  document.querySelectorAll("button.fix").forEach((b) => (b.onclick = () => suggestFix(r.job_id, b.dataset.rule, b.closest(".rule"))));
+  if (!done) $("submit").onclick = () => submitDecisions(r);
+}
+
+function ruleCard(v, done, d) {
+  const t = RULES[v.rule_id]?.title || v.rule_id;
+  // after validation, the lawyer's decision is the verdict; the AI's original is shown next to it
+  const final = d && d.action === "change_severity" && d.new_status ? d.new_status : v.status;
+  const lawyer = d ? `<span class="small muted">${d.action === "change_severity" ? `lawyer changed it (AI said ${esc(v.status)})`
+      : d.action === "approve" ? "lawyer approved" : esc(d.action.replace("_", " "))}</span>` : "";
+  return `<div class="rule ${v.needs_human ? "flagged" : ""}" data-rule="${v.rule_id}">
+    <div class="rule-head"><span class="pill ${final}">${final}</span><span class="t">${esc(t)}</span>${lawyer}
+      ${v.needs_human ? `<span class="pill flag">closer look</span><span class="small" style="color:var(--flag)">${esc(v.why_flagged)}</span>` : ""}
+      <span class="muted small" style="margin-left:auto">details ▾</span></div>
+    <div class="rule-body">
+      <div class="explain muted small">Loading…</div>
+      ${done ? "" : `<div class="row">
+        <div><label>Decision</label><select class="action">
+          <option value="approve">Approve</option><option value="change_severity">Change severity</option>
+          <option value="wrong_passage">Wrong passage cited</option><option value="not_applicable">Not applicable</option></select></div>
+        <div class="newstatus" hidden><label>Correct severity</label><select class="newstat">
+          <option>green</option><option>yellow</option><option>red</option></select></div>
+        <div><label>Reason</label><select class="reason">
+          <option value="approved">Approved</option><option value="wrong_severity">Wrong severity</option>
+          <option value="wrong_passage">Wrong passage</option><option value="rule_gap">Rule gap</option><option value="other">Other</option></select></div>
+      </div><label>Comment</label><input class="comment">`}
+      ${v.status !== "green" ? `<div class="actions"><button class="fix" data-rule="${v.rule_id}">Suggest a fix</button></div><div class="fixbox"></div>` : ""}
+    </div></div>`;
+}
+
+async function toggleRule(card, jobId) {
+  card.classList.toggle("open");
+  const box = card.querySelector(".explain");
+  if (!card.classList.contains("open") || box.dataset.loaded) return;
+  try {
+    const e = await api(`/reviews/${jobId}/verdicts/${card.dataset.rule}`);
+    const rule = RULES[card.dataset.rule];
+    box.classList.remove("muted", "small");
+    box.innerHTML = `<div><strong>Why:</strong> ${esc(e.rationale)}</div>
+      ${e.quote ? `<div class="quote">“${esc(e.quote)}”</div>` : `<div class="muted small">No clause cited (rule judged missing).</div>`}
+      ${Object.entries(e.cited_text).map(([id, t]) => `<details><summary class="small">Clause ${esc(id)}</summary><div class="cited">${esc(t)}</div></details>`).join("")}
+      ${e.samples && e.samples.length > 1 ? `<div class="small muted">Asked ${e.samples.length} times: ${e.samples.map(esc).join(", ")}</div>` : ""}
+      <details><summary class="small muted">Rule rubric</summary><div class="small">green: ${esc(rule?.green)}<br>yellow: ${esc(rule?.yellow)}<br>red: ${esc(rule?.red)}</div></details>`;
+    box.dataset.loaded = "1";
+  } catch (err) { box.innerHTML = `<span class="err">${esc(err.message)}</span>`; }
+}
+
+async function submitDecisions(r) {
+  const decisions = {};
+  document.querySelectorAll(".rule").forEach((c) => {
+    const a = c.querySelector(".action"); if (!a) return;
+    decisions[c.dataset.rule] = { action: a.value, reason_code: c.querySelector(".reason").value, comment: c.querySelector(".comment").value,
+      ...(a.value === "change_severity" ? { new_status: c.querySelector(".newstat").value } : {}) };
+  });
+  try { await api(`/reviews/${r.job_id}/decisions`, { method: "POST", body: JSON.stringify({ decisions }) }); openReview(r.job_id); loadReviews(); }
+  catch (e) { $("submit-err").textContent = e.message; }
+}
+
+async function suggestFix(jobId, rule, card) {
+  const box = card.querySelector(".fixbox"), btn = card.querySelector("button.fix");
+  btn.disabled = true; box.innerHTML = `<p class="muted small">Drafting a redline, then an independent checker verifies it (up to 3 rounds)…</p>`;
+  try {
+    const { fix_id } = await api(`/reviews/${jobId}/verdicts/${rule}/suggest-fix`, { method: "POST" });
+    let f; do { await new Promise((res) => setTimeout(res, 1500)); f = await api(`/fixes/${fix_id}`); } while (["queued", "drafting"].includes(f.status));
+    if (f.status === "failed") { box.innerHTML = `<p class="err">Could not draft a fix: ${esc(f.error)}</p>`; btn.disabled = false; return; }
+    box.innerHTML = renderFix(f);
+    box.querySelectorAll("button[data-act]").forEach((b) => (b.onclick = () => decideFix(f, b.dataset.act, box)));
+  } catch (e) { box.innerHTML = `<p class="err">${esc(e.message)}</p>`; btn.disabled = false; }
+}
+
+function renderFix(f) {
+  const sugg = (f.suggestions || []).length ? `<details><summary class="small">Optional suggestions (not applied)</summary><ul class="small">${f.suggestions.map((s) => `<li>${esc(s)}</li>`).join("")}</ul></details>` : "";
+  if (!f.verified) return `<div class="banner">No confident fix found. ${esc(f.why_no_fix || "")}</div>${sugg}
+    <label>Draft your own wording (optional)</label><textarea class="own" rows="4"></textarea>
+    <div class="actions"><button data-act="edit">Save my wording</button><button data-act="reject">Dismiss</button></div><div class="err fixerr"></div>`;
+  const red = f.redline;
+  const view = red.action === "replace" ? diff(f.original_text || "", red.new_text) : `<ins>${esc(red.new_text)}</ins>`;
+  return `<div class="small muted">${red.action === "replace" ? "Proposed change to" : "Proposed new clause after"} ${esc(red.segment_id)} · verified in ${f.rounds} round${f.rounds > 1 ? "s" : ""}</div>
+    <div class="diff">${view}</div><div class="small">${esc(red.explanation)}</div>${sugg}
+    <label>Edit before accepting (optional)</label><textarea class="own" rows="4">${esc(red.new_text)}</textarea>
+    <div class="row"><div><label>Reason</label><select class="freason"><option value="ok">OK</option><option value="over_reach">Over-reach</option>
+      <option value="partial_fix">Partial fix</option><option value="removed_protection">Removed a protection</option>
+      <option value="wrong_party">Wrong party</option><option value="style">Style</option><option value="other">Other</option></select></div></div>
+    <div class="actions"><button class="primary" data-act="accept">Accept</button><button data-act="edit">Accept my edit</button><button data-act="reject">Reject</button></div>
+    <div class="err fixerr"></div>`;
+}
+
+async function decideFix(f, act, box) {
+  const own = box.querySelector(".own")?.value, reason = box.querySelector(".freason")?.value || "other";
+  const body = { action: act, reason_code: act === "accept" ? "ok" : reason, ...(act === "edit" ? { final_text: own } : {}) };
+  try { const r = await api(`/fixes/${f.fix_id}/decision`, { method: "POST", body: JSON.stringify(body) });
+    box.innerHTML = `<p class="small">Recorded: ${esc(act)}${act === "edit" ? ` (you changed ${Math.round(r.lawyer_edit_ratio * 100)}% of the draft)` : ""}. Nothing is applied to the contract automatically.</p>`; }
+  catch (e) { box.querySelector(".fixerr").textContent = e.message; }
+}
+
+function diff(a, b) {  // word-level LCS diff
+  const A = a.split(/(\s+)/), B = b.split(/(\s+)/), n = A.length, m = B.length;
+  if (n * m > 4e6) return `<del>${esc(a)}</del>\n<ins>${esc(b)}</ins>`;
+  const L = Array.from({ length: n + 1 }, () => new Uint32Array(m + 1));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  let i = 0, j = 0, out = "";
+  while (i < n && j < m) {
+    if (A[i] === B[j]) { out += esc(A[i]); i++; j++; }
+    else if (L[i + 1][j] >= L[i][j + 1]) out += `<del>${esc(A[i++])}</del>`;
+    else out += `<ins>${esc(B[j++])}</ins>`;
+  }
+  while (i < n) out += `<del>${esc(A[i++])}</del>`;
+  while (j < m) out += `<ins>${esc(B[j++])}</ins>`;
+  return out;
+}
+</script>
+</body>
+</html>
