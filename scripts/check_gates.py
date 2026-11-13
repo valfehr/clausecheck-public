@@ -16,9 +16,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main() -> int:
     name = sys.argv[1]
-    f = sorted((ROOT / "runs").glob(f"*_{name}.jsonl"))[-1]
-    rows = [r for r in map(json.loads, f.read_text(encoding="utf-8").split("\n")) if r.get("pred_status")]
-    errors = sum(1 for r in map(json.loads, f.read_text(encoding="utf-8").split("\n")) if "error" in r)
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from compare_runs import latest  # scores against today's audited labels
+
+    all_rows = latest(name)
+    rows = [r for r in all_rows if r.get("pred_status")]
+    errors = sum(1 for r in all_rows if "error" in r)
     reds = [r for r in rows if r.get("expected_status") == "red"]
     recall = sum(r["pred_status"] == "red" for r in reds) / max(len(reds), 1)
     critical = sum(r["pred_status"] == "green" for r in reds)

@@ -170,6 +170,25 @@ def test_unverified_fix_cannot_be_accepted(client, drafter):
                        headers=A).status_code == 422
 
 
+def test_completed_review_returns_lawyer_decisions(client):
+    job = _review(client)
+    d = {"decisions": {"insurance": {"action": "change_severity", "new_status": "yellow", "reason_code": "wrong_severity"}}}
+    client.post(f"/reviews/{job}/decisions", json=d, headers=A)
+    s = client.get(f"/reviews/{job}", headers=A).json()
+    assert s["status"] == "completed" and s["decisions"]["insurance"]["new_status"] == "yellow"
+
+
+def test_failures_are_shown_in_plain_words():
+    msg = api._user_message(RuntimeError("Error code: 400 - Your credit balance is too low to access the Anthropic API"))
+    assert "usage limit" in msg and "400" not in msg
+    assert "logged" in api._user_message(KeyError("internal detail"))
+
+
+def test_ui_page_is_served(client):
+    r = client.get("/")
+    assert r.status_code == 200 and "<title>ClauseCheck</title>" in r.text
+
+
 def test_unknown_rule_rejected(client):
     doc = upload(client)
     assert client.post("/reviews", json={"document_id": doc, "rules": ["made_up"]}, headers=A).status_code == 422
